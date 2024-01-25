@@ -156,15 +156,11 @@ How many rows and columns do you see in the data (`count.df`), and what do they 
 # YOUR CODE HERE
 ```
 
-We have `r nrow(count.df)` genes.
-
 * Number of columns:
 
 ```{r}
 # YOUR CODE HERE
 ```
-
-We have `r ncol(count.df)` samples.
 
 #### B. What are the features (1 pt)?
 

@@ -183,8 +183,6 @@ do they correspond to (genes/features or samples/individuals)?
 # YOUR CODE HERE
 ```
 
-We have 63677 genes.
-
   - Number of columns:
 
 <!-- end list -->
@@ -192,8 +190,6 @@ We have 63677 genes.
 ``` r
 # YOUR CODE HERE
 ```
-
-We have 711 samples.
 
 #### B. What are the features (1 pt)?
 
