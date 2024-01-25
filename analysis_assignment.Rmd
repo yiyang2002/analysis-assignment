@@ -10,9 +10,9 @@ output: github_document
 
 ### Background
 
-In this assignment, we will explore the complexity of Acute Myeloid Leukemia (AML), an aggressive type of blood cancer, in multiomics data integration. One of the biggest outstanding challenges in AML study is that a wide variety of cancer-causing mutations has been frequently spotted in genes involved in a hematopoietic stem cell (HSC) differentiation process. Such mutations can dramatically alter developmental and HSC different ion trajectories and bring about an immense level of heterogeneity among cancer cells.
+In this assignment, we will explore the complexity of Acute Myeloid Leukemia (AML), an aggressive type of blood cancer, in multiomics data integration. One of the biggest outstanding challenges in AML study is that a wide variety of cancer-causing mutations has been frequently spotted in genes involved in a hematopoietic stem cell (HSC) differentiation process. Such mutations can dramatically alter developmental/differentiation trajectories, increase heterogeneity among cancer cells, and obfuscate downstream analysis.
 
-We will use a comprehensive data set, ["BeatAML2,"](https://biodev.github.io/BeatAML2/) which contains the raw and processed gene expression data used in [Bottomly _et al._](https://www.sciencedirect.com/science/article/pii/S1535610822003129) as well as other clinical, genetic, and drug response variables. We will investigate how multiple types of high-dimensional sequencing results are combined in real-world settings. Here, we will focus on data wrangling, exploratory data analysis, and differential gene expression analysis, but many other scientific questions can be explored, especially linking genetic and drug response variables.
+We will use a comprehensive data set, ["BeatAML2,"](https://biodev.github.io/BeatAML2/) which contains the raw and processed gene expression data used in [Bottomly _et al._](https://www.sciencedirect.com/science/article/pii/S1535610822003129) as well as other clinical, genetic, and drug response variables. We will investigate how multiple types of high-dimensional sequencing results can be combined in real-world settings. Here, we will focus on data wrangling, exploratory data analysis, and differential gene expression analysis, but many other scientific questions can be explored, especially linking genetic and drug response variables.
 
 #### Load libraries
 
@@ -37,6 +37,8 @@ if.needed <- function(.file, .code) {
 
 ## A quick function to concatenate two strings
 `%&%` <- function(a,b) paste0(a,b)
+
+## Feel free to define your own housekeeping functions
 ```
 
 #### A primer for data management
@@ -75,11 +77,11 @@ rather unconventional characters. Instead of using `read.table`
 directly, here we read the data using `fread` and transformed the
 `data.table` type into `data.frame`.
 
-This study also provide clinical information in Microsoft Excel
-format. A function, `read_xlsx`, provides a convenient and
+This study also comes with clinical information in Microsoft Excel
+format. A function, `read_xlsx`, gives us a convenient and
 programmatic way to read the necessary information. If you want to
-live up to reproducible data science, it is necessarily important to
-avoid arbitrary/manual operations in your analysis pipeline.
+live up to reproducible data science, it is highly encouraged to avoid
+arbitrary/manual operations in your analysis pipeline.
 
 ```{r read_meta_data}
 .cols <- c(
@@ -110,14 +112,7 @@ meta.df <-
 colnames(meta.df) <- gsub("[%][.]", "", colnames(meta.df))
 ```
 
-In practice, many columns, which are supposed to be quantitative, may
-come with corrupted, non-numeric values. Looking through every bit of
-such columns will be laborious and may cause another type of unwanted
-errors/formats. It is important to deal with such painful steps in a
-programmatic way. We will deal with it in a `tidyverse` (or `dplyr`)
-way or `data.table` way. First, we can clean up the annotation data by
-applying the `take.numeric` function "`dplyr::across`" all the columns
-except for the categorical ones.
+In practice, many columns, which are supposed to be quantitative, may come with corrupted, non-numeric values. Looking through every bit of such columns will be laborious and may cause another type of unwanted errors/formats. Let's deal with such painful steps programmatically. We will deal with it in a `tidyverse` (or `dplyr`) way or `data.table` way. First, we can clean up the annotation data by applying the `take.numeric` function "`dplyr::across`" all the columns except for the categorical ones.
 
 ```{r data_cleaning_tidyr_way}
 take.numeric <- function(x) {
@@ -131,7 +126,7 @@ meta.df <- meta.df %>%
     ))
 ```
 
-Or you may `lapply` the `take.numeric` function within the following `data.table` list.
+*Side note:* You may `lapply` the `take.numeric` function within the following `data.table` list.
 
 ```{r data_cleaning_data_table_way, eval=F}
 .dt <- as.data.table(meta.df)
@@ -173,9 +168,9 @@ We have `r ncol(count.df)` samples.
 
 #### B. What are the features (1 pt)?
 
-One of the columns, `biotype`, indicates a biological type of each row
+One of the columns, `biotype`, indicates the biological type of each row
 (feature).  Can you count how many types exist and how many of each
-type do we have? If possible, sort the rows in the descending order of
+type we have? If possible, sort the rows in the descending order of
 frequency.
 
 * HINT: You can summarize these as a table.
@@ -226,7 +221,7 @@ cts.df <- read_xlsx(cts.file)
 # YOUR CODE HERE
 ```
 
-* Show that there is strong correspondence between the observe and estimated cell type fractions by displaying correlation heatmap. Provide your own interpretations (0.5 pt). HINT: Deal with missing values with `use="pairwise.complete.obs"` option when computing `cor` matrix; use `pheatmap` for visualization.
+* Show that there is a strong correspondence between the observe and estimated cell type fractions by displaying a correlation heatmap. Provide your own interpretations (0.5 pt). HINT: Deal with missing values with `use="pairwise.complete.obs"` option when computing `cor` matrix; use `pheatmap` for visualization.
 
 ```{r}
 # YOUR CODE HERE
@@ -456,7 +451,11 @@ ADD YOUR THOUGHTS.
 
 #### A. Set up differential gene expression analysis (1 pt)
 
-First set up a model matrix with cell type estimation scores (variables ending with "like") as covariates. Then calculate variance weights with `voom`, and generate the mean-variance trend plot (1 pt). HINT: filter out samples with "NA" values in your design matrix. Include all the cell type scores in your design matrix.
+First, set up a model matrix with cell type estimation scores
+(variables ending with "like") as covariates. Then calculate variance
+weights with `voom`, and generate the mean-variance trend plot (1
+pt). HINT: Filter out samples with "NA" values in your design
+matrix. Include all the cell type scores in your design matrix.
 
 
 ```{r}
@@ -465,7 +464,8 @@ First set up a model matrix with cell type estimation scores (variables ending w
 
 #### B. Fit linear models (1 pt)
 
-Use `limma` (`lmFit` and `eBayes`) to fit the linear model with the model matrix you just created.
+Use `limma` (`lmFit` and `eBayes`) to fit the linear model with the
+model matrix you just created.
 
 ```{r}
 # YOUR CODE HERE
@@ -473,8 +473,8 @@ Use `limma` (`lmFit` and `eBayes`) to fit the linear model with the model matrix
 
 #### C. Top genes (1 pt)
 
-Print the 10 top-ranked genes by adjusted p-value for the "GMP.like" coefficient using topTable.
-
+Print the 10 top-ranked genes by adjusted p-value for the "GMP.like"
+coefficient using topTable.
 
 ```{r}
 # YOUR CODE HERE
@@ -537,7 +537,7 @@ How many samples do have in each prognosis group (0.5 pt)?
 ```
 
 
-Set up the model matrix with cell type estimation scores and the new prognosis variable. Then calculate variance weights with voom, and generate the mean-variance trend plot (1 pt). HINT: filter out samples with "NA" values in your design matrix. Make sure that the prognosis variable is of factors.
+Set up the model matrix with cell type estimation scores and the new prognosis variable. Then calculate variance weights with voom, and generate the mean-variance trend plot (1 pt). HINT: Filter out samples with "NA" values in your design matrix. Make sure that the prognosis variable is of factors.
 
 
 ```{r}
@@ -589,8 +589,7 @@ Report how many interaction terms are significantly associated at FDR 10%. Break
 
 #### C. Visualize top interaction DEGs (1 POINT)
 
-Show condition-specific scatter plots for these top genes (x-axis: the cell type scores; y-axis: gene expression). Show all the significant genes and the relevant cell types. HINT: Create a long form data after subsetting top genes.
-
+Show condition-specific scatter plots for these top genes (x-axis: the cell type scores; y-axis: gene expression). Show all the significant genes and the relevant cell types. HINT: Create a long-form data frame/tibble after subsetting top genes.
 
 ```{r}
 # YOUR CODE HERE
