@@ -638,10 +638,10 @@ Of the deceased patients (`vitalStatus == "Dead"`), we may define two
 patient groups according to their survival time, using the median value
 as a threshold value. More precisely, we have
 
-  - poor prognosis: a patient deceased with the survival time greater
+  - good prognosis: a patient deceased with the survival time greater
     than or equal to the median;
 
-  - good prognosis: a patient deceased with the survival time less than
+  - poor prognosis: a patient deceased with the survival time less than
     the median.
 
 First, create a new `dge` by subsetting on the deceased individuals (0.5
