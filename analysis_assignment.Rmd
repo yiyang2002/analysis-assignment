@@ -4,6 +4,8 @@ author: "YOUR NAME"
 output: github_document
 ---
 
+The URL that points to my analysis assignment repository is [here](REPLACEWITHYOURURL).
+
 - **Reminder:** When answering the questions, it is not sufficient to provide only code. Add explanatory text to interpret your results throughout.
 
 - **Total:** 30 POINTS
