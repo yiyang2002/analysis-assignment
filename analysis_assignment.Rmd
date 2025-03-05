@@ -459,7 +459,7 @@ plotMA(res_A_vs_B, main = "MA Plot: CHD8A vs CHD8B")
 res_A_vs_B_df <- as.data.frame(res_A_vs_B)
 
 ggplot(res_A_vs_B_df, aes(x = pvalue)) +
-  geom_histogram(bins = 50, fill = "green", color = "black") +
+  geom_histogram(bins = 50, fill = "blue", color = "black") +
   theme_classic() +
   xlab("P-value") +
   ylab("Count of genes") +
