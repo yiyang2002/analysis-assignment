@@ -8,40 +8,35 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 ## Link to my assignment repository
 
-Fill in the link to your assignment repository here: [STAT 540 Analysis Assignment](<insert link here>)
+Fill in the link to your assignment repository here: [STAT 540 Analysis Assignment](insert%20link%20here)
 
 ## Instructions
 
-* You only need to fill in the code chunks and text where indicated with **Exercise #**.
-* When answering the questions, it is not sufficient to provide only code. Add explanatory text to interpret your results throughout.
-* Make sure to add comments to your code to explain what you are doing in each step.
+-   You only need to fill in the code chunks and text where indicated with **Exercise \#**.
+-   When answering the questions, it is not sufficient to provide only code. Add explanatory text to interpret your results throughout.
+-   Make sure to add comments to your code to explain what you are doing in each step.
 
 ## Academic Integrity
 
 If you use any generative AI tools to complete the assignment, please provide a brief explanation of how you used them:
 
-1. What tool(s) did you use (e.g. chatGPT, Claude, GitHub co-pilot)?
+1.	What tool(s) did you use (e.g., ChatGPT, Claude, GitHub Copilot)?
+I used ChatGPT to deepen my understanding of concepts taught in class and to clarify any questions I had.
 
-<YOUR WRITTEN ANSWER HERE>
+2.	How did the tool(s) fit into your workflow? What was input into the tool?
+I asked questions about specific concepts related to the course material to better understand them before applying them in my work.
 
-2. How did the tool(s) fit into your workflow? What was input into the tool?
+3.	What did you receive as output?
+I received explanations and clarifications that helped me grasp the concepts more thoroughly.
 
-<YOUR WRITTEN ANSWER HERE>
-
-3. What did you receive as output?
-
-<YOUR WRITTEN ANSWER HERE>
-
-4. Did you modify or verify the output?
-
-<YOUR WRITTEN ANSWER HERE>
+4.	Did you modify or verify the output?
+Yes, I used the explanations to enhance my understanding before starting to code, ensuring I had a solid grasp of the material.
 
 ### Background
 
-The dataset used for this assignment has been published by [Shi et al. in 2023](https://www.cell.com/ajhg/fulltext/S0002-9297(23)00317-8) in the American Journal of Human Genetics. You'll recognize this study, "Heterozygous deletion of the autism-associated gene CHD8 impairs synaptic function through widespread changes in gene expression and chromatin compaction" as  the paper you were asked to review for the Paper Critique assignment. The raw RNA-seq read counts, and binned ATAC-seq counts for this study are available in GEO.
+The dataset used for this assignment has been published by [Shi et al. in 2023](https://www.cell.com/ajhg/fulltext/S0002-9297(23)00317-8) in the American Journal of Human Genetics. You'll recognize this study, "Heterozygous deletion of the autism-associated gene CHD8 impairs synaptic function through widespread changes in gene expression and chromatin compaction" as the paper you were asked to review for the Paper Critique assignment. The raw RNA-seq read counts, and binned ATAC-seq counts for this study are available in GEO.
 
 ## Packages required
 
@@ -62,7 +57,7 @@ set.seed(3846)
 
 ## Part 1 - Accessing RNA-seq data using GEOquery
 
-Here we'll read in the RNA-seq dataset. The RNA-seq read counts are read in from a compressed `.txt` file, which was obtained from the [GEO entry](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE236993). The sample metadata is read in with a single line of code using the `getGEO()` function from the `GEOquery` package. 
+Here we'll read in the RNA-seq dataset. The RNA-seq read counts are read in from a compressed `.txt` file, which was obtained from the [GEO entry](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE236993). The sample metadata is read in with a single line of code using the `getGEO()` function from the `GEOquery` package.
 
 ```{r, read in data}
 # download RNA-seq file 
@@ -136,7 +131,7 @@ rownames(coldata) <- coldata$ID
 colnames(rna) <- coldata$ID
 ```
 
-Now, we will use the `DESeqDataSetFromMatrix` function to create a `DESeqDataSet` object. This object will join the count data and the sample metadata, as well as specify the design formula for the differential expression analysis. Note that here we will use "~ 0 + Condition" in the design formula (the cell means parameterization). This is because we would like to be able to test for differences between various condition combinations in our analysis (which will use contrasts).
+Now, we will use the `DESeqDataSetFromMatrix` function to create a `DESeqDataSet` object. This object will join the count data and the sample metadata, as well as specify the design formula for the differential expression analysis. Note that here we will use "\~ 0 + Condition" in the design formula (the cell means parameterization). This is because we would like to be able to test for differences between various condition combinations in our analysis (which will use contrasts).
 
 ```{r, create DESeqDataSet}
 # create DESeqDataSet object
@@ -156,6 +151,7 @@ Recall from the published paper that the authors stated that they analyzed 15,57
 dds <- dds[rowSums(counts(dds)) > 0,]
 nrow(dds)
 ```
+
 OK, a little closer. Perhaps they used a filter like at least 2 samples with a count of 1?
 
 ```{r, filter genes 2}
@@ -164,9 +160,9 @@ dds <- dds[rowSums(counts(dds)) >= 2,]
 nrow(dds)
 ```
 
-We don't know for sure what their criteria for "undetected" was since it wasn't reported, but this is reasonably close so we'll move on with this set of genes. 
+We don't know for sure what their criteria for "undetected" was since it wasn't reported, but this is reasonably close so we'll move on with this set of genes.
 
-We'll next look at the distribution of counts across samples. 
+We'll next look at the distribution of counts across samples.
 
 ```{r, EDA}
 # plot the distribution of counts
@@ -181,7 +177,6 @@ assays(dds)$counts %>%
 ```
 
 We can see these distributions are highly skewed, as expected for raw count data. Let's remake the previous plot using variance stabilized counts, which also rescales values to the middle range of sequencing depth across samples.
-
 
 ```{r, EDA VST}
 assays(dds)$counts %>%
@@ -203,13 +198,32 @@ Now For the first Exercise: let's visualize a sample-sample correlation heatmap 
 A. Construct a heatmap where each cell represents the spearman correlation between two samples. Use the variance stabilized counts for this analysis, and refer back to Lecture 3 for tips on constructing heatmaps (use an appropriate colour scale, and order rows/columns meaningfully). (3 points)
 
 ```{r, Exercise 1}
-# <YOUR CODE HERE>
+library(DESeq2)
+library(tidyverse)
+library(pheatmap)
+
+# 1) Variance-Stabilizing Transformation (VST)
+vsd <- vst(dds)  
+
+# 2) Extract the VST assay (transformed counts)
+vsd_mat <- assay(vsd)
+
+# 3) Compute the Spearman correlation matrix among samples
+sample_cor <- cor(vsd_mat, method = "spearman")
+
+# 4) Plot the correlation matrix as a heatmap
+pheatmap(
+  sample_cor,
+  color = colorRampPalette(c("blue", "white", "red"))(50),
+  main = "Sample-Sample Correlation (Spearman)"
+)
 
 ```
+
 B. What do you observe that matches your expectations? Do you see anything surprising? If so, what could explain what you see? (2 points)
 
-<YOUR ANSWER HERE>
-
+<YOUR WRITTEN ANSWER HERE>
+In the Spearman correlation heatmap of eight biological samples from three conditions (WT, CHD8A, and CHD8B) derived from variance-stabilized transformation counts, the color scale ranges from dark blue (≈0.88) to dark red (1.0). Perfect self-correlations appear in dark red along the diagonal. Within each condition, CHD8A replicates show the highest correlations (red), followed by CHD8B, while WT replicates have the lowest correlations with each other. Between-condition comparisons are shown in mostly blue and white, indicating lower correlation coefficients that reflect more pronounced differences in gene expression profiles. Notably, CHD8A and CHD8B cluster more closely with each other than with WT, indicating shared transcriptional changes. The dendrogram confirms this clustering.
 
 ## Part 4 - Differential expression analysis
 
@@ -224,17 +238,52 @@ A. Run a DESeq2 analysis comparing the two mutant groups to WT, and summarize th
 *Hint: to compare the two mutant groups to WT, you can use a numeric contrast in the `results()` function.*
 
 ```{r, Exercise 2A}
-# <YOUR CODE HERE>
+dds <- DESeq(dds)
+# Check the available coefficient names
+resultsNames(dds)
+
+# Combine CHD8A and CHD8B vs WT
+res_mut_vs_wt <- results(
+  dds,
+  contrast = c(0.5, 0.5, -1),
+  alpha = 0.10
+)
+
+# Summarize the result
+summary(res_mut_vs_wt)
+
+sig_genes_mut_vs_wt <- subset(res_mut_vs_wt, padj < 0.1)
+n_sig_mut_vs_wt <- nrow(sig_genes_mut_vs_wt)
+
+# Among these, count how many are up/down in CHD8 mutants
+up_reg <- sum(sig_genes_mut_vs_wt$log2FoldChange > 0, na.rm = TRUE)
+down_reg <- sum(sig_genes_mut_vs_wt$log2FoldChange < 0, na.rm = TRUE)
 
 ```
+
 <YOUR WRITTEN ANSWER HERE>
+The DESeq2 analysis comparing CHD8 mutant samples (combining CHD8A and CHD8B) to WT, using a BH adjusted p-value threshold of 0.10, identified 306 significantly upregulated genes (log₂ fold change > 0) and 461 significantly downregulated genes (log₂ fold change < 0) out of 15,434 genes with nonzero read counts. Additionally, about 43% of genes with low counts (mean count < 5) were filtered out during preprocessing. Although these totals differ from the original study’s report of 1,169 DEGs (475 increased and 694 decreased), the overall pattern of differential expression aligns with the expected biological differences between CHD8 mutants and WT. The lower DEG count may stem from stricter filtering (e.g., at least 2 samples with counts ≥ 1) or differences in DESeq2 settings.
 
 B. Diagnostics: Visualize the distribution of p-values, and the relationship between the mean of normalized counts and shrunken dispersion estimates. Comment on what you see. (2 points)
- 
+
 ```{r, Exercise 2B}
 # <YOUR CODE HERE>
+res_mut_df <- as.data.frame(res_mut_vs_wt) %>%
+  rownames_to_column(var = "gene")
 
+ggplot(res_mut_df, aes(x = pvalue)) +
+  geom_histogram(bins = 50, fill = "blue", color = "black") +
+  theme_minimal() +
+  xlab("P-value") +
+  ylab("Number of genes") +
+  ggtitle("P-value Distribution: CHD8 Mut vs WT")
+
+plotDispEsts(dds)
 ```
+<YOUR WRITTEN ANSWER HERE>
+The histogram of p-values displays a notable spike near zero, which indicates that a considerable fraction of genes is genuinely differentially expressed in CHD8 mutants compared to WT. Beyond that initial peak, the p-values are broadly uniform, implying that for the majority of genes, the null hypothesis (no differential expression) holds. This pattern suggests that the filtering and normalization procedures have not introduced systematic artifacts and that there is no excessive clustering of spurious low p-values.
+
+In dispersion plot, the black dots represent the raw gene-wise dispersion estimates, which generally follow a downward trend as the mean count increases. The red line is the fitted dispersion curve, and the blue points correspond to the final (empirical Bayes–shrunk) dispersion estimates. Genes with extreme raw dispersions are moderated (“shrunk”) toward the fitted curve, thereby stabilizing their variance estimates. This approach is especially beneficial when sample sizes are small, as it prevents artificially low dispersions from inflating significance and inflates the power to detect true differences. Overall, the trend line indicates that genes with higher mean expression levels exhibit lower relative variability, and the fact that most points cluster around the line implies that the DESeq2 model is capturing the mean–variance relationship effectively. These diagnostics together suggest that the data quality is good.
 
 
 ### Exercise 3: Reproduce the volcano plot (5 points)
@@ -242,78 +291,185 @@ B. Diagnostics: Visualize the distribution of p-values, and the relationship bet
 Recreate a plot in the style of Figure 2E of the paper (shown below) to visualize the result you obtained in Exercise 2. Add labels for the top 20 genes by significance. Comment on any major similiarities or differences.
 
 ![](img/fig2E.jpg)
-
 ```{r, Exercise 3}
-# <YOUR CODE HERE>
+res_volcano <- as.data.frame(res_mut_vs_wt) %>%
+  rownames_to_column(var = "gene") %>%
+  mutate(
+    negLog10Padj = -log10(padj),
+    isSig = ifelse(padj < 0.1, "Significant", "Not significant")
+  )
 
+# Identify the top 20 genes by adjusted p-value (padj)
+top20_genes <- res_volcano %>%
+  arrange(padj) %>%
+  head(20)
+
+# Create the volcano plot with top20 gene labels
+ggplot(res_volcano, aes(x = log2FoldChange, y = negLog10Padj)) +
+  geom_point(aes(color = isSig), alpha = 0.6) +
+  scale_color_manual(values = c("Not significant" = "grey", "Significant" = "red")) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "darkgrey") +
+  geom_hline(yintercept = -log10(0.1), linetype = "dashed", color = "blue") +
+  geom_label_repel(
+    data = top20_genes,
+    aes(label = gene),
+    size = 3,
+    max.overlaps = 20
+  ) +
+  scale_x_continuous(breaks = seq(-3, 3, by = 1)) +
+  labs(
+    title = "Volcano Plot: CHD8 Mutant vs. WT",
+    x = "log2 Fold Change",
+    y = "-log10 (Adjusted p-value)"
+  ) +
+  theme_bw()
 ```
 
 <YOUR WRITTEN ANSWER HERE>
+Both plots highlight similar DEGs, such as PPP1R17, BCAT1, SPARC, PRDX1, RPS27L, SIX1, HES6, FSTL1, CXADR, and NTS, indicating consistency in results. The legend differs, with the original plot using red for FDR < 5% and black for FDR > 5%, while the new plot categorizes genes as Significant (red) and Not significant (grey). Additionally, the y-axis differs, with the original plot displaying -log₁₀ Q-value, whereas the new plot represents -log₁₀ adjusted p-value, which may cause slight differences in significance ranking.
+The isSig column contains NA values because it is derived from the padj column, which includes NA values due to independent filtering in DESeq2. When padj is NA, the condition ifelse(padj < 0.1, "Significant", "Not significant") leads to NA values in isSig.
 
 ### Exercise 4: Compare overlap of significant genes (3 points)
 
-The authors provide a list of DEGs in [Supplementary Table S1](https://www.cell.com/cms/10.1016/j.ajhg.2023.09.004/attachment/38417a36-e543-42e6-a650-dc967c0ea491/mmc2.txt). This file is provided in this repository for convenience (`mmc2.txt`). 
+The authors provide a list of DEGs in [Supplementary Table S1](https://www.cell.com/cms/10.1016/j.ajhg.2023.09.004/attachment/38417a36-e543-42e6-a650-dc967c0ea491/mmc2.txt). This file is provided in this repository for convenience (`mmc2.txt`).
 
 A. How many genes are in this file? Based on the paper, how many genes do you expect to be in this file? (0.5 point)
 
 ```{r, Exercise 4a}
 # <YOUR CODE HERE>
-
+supp_file <- "mmc2.txt"  # Update path if needed
+supp <- read.delim(supp_file, header = TRUE, sep = "\t")
+colnames(supp) <- supp[1, ]
+supp <- supp[-1, ]
+rownames(supp) <- NULL
+nrow(supp)
+head(supp)  # Inspect first rows
 ```
 
 <YOUR WRITTEN ANSWER HERE>
+We have 569 genes in this file, but according to the paper’s description, we expect exactly 1,169 genes to be present. The file’s 569 genes are possibly a subset of significant DEGs.
 
 B. Find the proportion of the DEGs you already identified in Exercise 2 that are listed in this file. (0.5 point)
 
 ```{r, Exercise 4b}
 # <YOUR CODE HERE>
+my_sig_genes <- rownames(sig_genes_mut_vs_wt)
+supp_genes <- supp$gene  # Adjust if column name differs
 
+overlap_genes <- intersect(my_sig_genes, supp_genes)
+prop_overlap <- length(overlap_genes) / length(my_sig_genes)
+prop_overlap
 ```
 
 <YOUR WRITTEN ANSWER HERE>
+There is a 68 percent overlap
 
-C. The supplementary file appears to possibly contain a list of DEGs with adjusted pvalue < 0.1 for the comparison of CHD8 **isoform B** samples to WT (notice the range of values in the column that contains adjusted p-values for isoform B, and that there are no other adjusted p-values reported). Carry out this comparison (isoform B vs WT) using contrasts, and find the proportion of these DEGs that are present in this file. (1 point)
+C. The supplementary file appears to possibly contain a list of DEGs with adjusted pvalue \< 0.1 for the comparison of CHD8 **isoform B** samples to WT (notice the range of values in the column that contains adjusted p-values for isoform B, and that there are no other adjusted p-values reported). Carry out this comparison (isoform B vs WT) using contrasts, and find the proportion of these DEGs that are present in this file. (1 point)
 
 ```{r, Exercise 4c}
 # <YOUR CODE HERE>
+resultsNames(dds)
+# Compare CHD8B vs WT using a character contrast
+res_B_vs_WT <- results(dds, contrast = c(0, 1, -1), alpha = 0.1)
 
+# Subset significant genes (padj < 0.1)
+sig_B_vs_WT <- subset(res_B_vs_WT, padj < 0.1)
+sig_B_genes <- rownames(sig_B_vs_WT)
+
+# Assuming the supplementary file has a column named 'gene' with gene names:
+supp_genes <- supp$gene  # Adjust the column name if necessary
+
+# Calculate the overlap and the proportion of overlapping genes
+overlap_B <- intersect(sig_B_genes, supp_genes)
+prop_overlap_B <- length(overlap_B) / length(sig_B_genes)
+prop_overlap_B
 ```
 
 <YOUR WRITTEN ANSWER HERE>
+There is a 80 percent overlap 
 
 D. What could the authors do to improve the reproducibility of their results? (1 point)
 
 <YOUR WRITTEN ANSWER HERE>
+To improve reproducibility, the authors could share their complete analysis scripts and software environment details. They should also specify filtering criteria for low-expressed genes and confirm which exact comparison each supplementary table corresponds to. 
 
 ### Exercise 5: Visualize results of top DEGs between CHD8 mutant and WT samples (3 points)
 
-Let's visualize the top 12 DEGs from the comparison of CHD8 mutant samples to WT samples (from Exercise 2). Use boxplots and/or individual points to show the distribution of VST counts for these genes across the three sample groups. 
+Let's visualize the top 12 DEGs from the comparison of CHD8 mutant samples to WT samples (from Exercise 2). Use boxplots and/or individual points to show the distribution of VST counts for these genes across the three sample groups.
 
 ```{r, Exercise 5}
 # <YOUR CODE HERE>
+library(ggplot2)
 
+# 1) Top 12 significant genes
+res_mut_df <- as.data.frame(res_mut_vs_wt) %>%
+  rownames_to_column(var = "gene") %>%
+  arrange(padj)
+top12_genes <- head(res_mut_df$gene, 12)
+
+# 2) Extract VST counts
+vsd_mat <- assay(vsd)  # from earlier
+top12_vsd <- vsd_mat[top12_genes, ]  # subset just those genes
+
+# 3) Convert to "long" format
+top12_vsd_df <- as.data.frame(top12_vsd) %>%
+  rownames_to_column(var = "gene") %>%
+  gather(key = "sampleID", value = "vst_count", -gene)
+
+# 4) Retrieve Condition info from colData
+meta_df <- as.data.frame(colData(dds)) %>%
+  rownames_to_column(var = "sampleID")
+
+top12_plot_df <- left_join(top12_vsd_df, meta_df, by = "sampleID")
+
+# 5) Plot: one panel per gene, color by Condition
+ggplot(top12_plot_df, aes(x = Condition, y = vst_count, color = Condition)) +
+  geom_jitter(width = 0.2, alpha = 0.7) +
+  facet_wrap(~ gene, scales = "free_y") +
+  theme_bw(base_size = 12) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Top 12 DEGs (CHD8 Mut vs WT)", y = "VST Counts")
 ```
+Most DEGs show higher/lower expression in mutants vs. WT, consistent with Exercise 2
 
 ### Exercise 6: Visualize results of top DEGs between CHD8 mutant A and CHD8 mutant B samples (4 points)
 
 A. How many DEGs are there between CHD8 mutant A samples to CHD8 mutant B samples (hint: you'll need to first run this contrast)? Does this align with what you expect? (2 points)
 
-
 ```{r, Exercise 6a}
 # <YOUR CODE HERE>
+resultsNames(dds)
+res_A_vs_B <- results(dds, contrast = c(1, -1, 0), alpha = 0.1)
+summary(res_A_vs_B)
 
+sig_A_vs_B <- subset(res_A_vs_B, padj < 0.1)
+n_deg_A_vs_B <- nrow(sig_A_vs_B)
+n_deg_A_vs_B
 ```
 
 <YOUR WRITTEN ANSWER>
+The DESeq2 analysis comparing CHD8A vs. CHD8B found 37 DEGs (14 up, 23 down) at padj < 0.1, far fewer than the 569 DEGs vs. WT. This aligns with expectations, as CHD8A and CHD8B share similar transcriptional profiles. The high proportion of low-count genes (50%) also contributes to the reduced DEG count.
 
 B. Finally, let's visualize an MA plot of the DE results comparing the two mutant isoforms in part A, as well as a histogram of the p-values for this comparison. Comment on what you see. (2 points)
 
 ```{r, Exercise 6b}
 # <YOUR CODE HERE>
+plotMA(res_A_vs_B, main = "MA Plot: CHD8A vs CHD8B")
 
+res_A_vs_B_df <- as.data.frame(res_A_vs_B)
+
+ggplot(res_A_vs_B_df, aes(x = pvalue)) +
+  geom_histogram(bins = 50, fill = "green", color = "black") +
+  theme_classic() +
+  xlab("P-value") +
+  ylab("Count of genes") +
+  ggtitle("P-value Distribution: CHD8A vs CHD8B")
 ```
 
 <YOUR WRITTEN ANSWER>
+In the MA plot, majority of points lie near zero on the y-axis, indicating that the log2 fold change for most genes is small or negligible, implying minimal overall expression differences between the two isoforms. A few genes scattered above or below this zero line, reflecting modest differences in expression.The blue points represent significantly differentially expressed genes (DEGs) at an adjusted p-value threshold, highlighting the relatively few genes with meaningful expression changes between CHD8A and CHD8B. The absence of large clusters of extreme fold changes further reinforces their transcriptional similarity.
+
+Turning to the p-value distribution, a roughly uniform histogram implies that few genes are genuinely differentially expressed at typical significance thresholds. When there is no strong systematic difference between two conditions, we expect p-values to spread evenly across the 0–1 range, rather than clustering near zero. Because there is no distinct peak of very low p-values, the data further support the idea that CHD8A and CHD8B do not exhibit widespread transcriptional divergence.
 
 ## Part 5 - Next steps
 
