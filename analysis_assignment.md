@@ -1,11 +1,11 @@
 STAT 540 Analysis Assignment
 ================
-<YOUR NAME HERE>
+Yiyang Wang
 
 ## Link to my assignment repository
 
 Fill in the link to your assignment repository here: [STAT 540 Analysis
-Assignment](insert%20link%20here)
+Assignment]([insert%20link%20here](https://github.com/yiyang2002/analysis-assignment.git))
 
 ## Instructions
 
