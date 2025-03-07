@@ -802,14 +802,9 @@ meaningful expression changes between CHD8A and CHD8B. The absence of
 large clusters of extreme fold changes further reinforces their
 transcriptional similarity.
 
-Turning to the p-value distribution, a roughly uniform histogram implies
-that few genes are genuinely differentially expressed at typical
-significance thresholds. When there is no strong systematic difference
-between two conditions, we expect p-values to spread evenly across the
-0–1 range, rather than clustering near zero. Because there is no
-distinct peak of very low p-values, the data further support the idea
-that CHD8A and CHD8B do not exhibit widespread transcriptional
-divergence.
+
+
+The p-value distribution is skewed toward higher P values, indicating that most genes do not exhibit significant differential expression between CHD8A and CHD8B. If there were strong transcriptional differences, we would expect a concentration of low p-values near zero. Instead, the lack of this pattern suggests that only a small number of genes show statistically significant differential expression between these two conditions.
 
 ## Part 5 - Next steps
 
